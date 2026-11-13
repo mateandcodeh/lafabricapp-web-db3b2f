@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FabricAppaWebPwaApk · Creador de apps</title>
+<meta name="theme-color" content="#0d1117">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{--bg: #0d1117;--panel: #161b22;--border:#30363d;--tx: #e6edf3;--sub: #8b949e;--ac: #8b5cf6;--ok:#2f9e6e;--err:#d64545;--warn:#d29922}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx);padding:16px;max-width:640px;margin:0 auto}
+header{display:flex;align-items:center;gap:10px;padding:6px 0 18px;flex-wrap:wrap}
+h1{font-size:20px}
+.sub{font-size:12px;color:var(--sub);flex:1;min-width:120px}
+.ico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--ac),#6d28d9);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+.pill{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);color:var(--sub)}
+.pill.on{color:var(--ok);border-color:var(--ok)}
+.pill.err{color:var(--err);border-color:var(--err)}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;animation:aparecer .25s ease}
+@keyframes aparecer{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.card h2{font-size:15px;margin-bottom:4px}
+.card .d{font-size:12.5px;color:var(--sub);margin-bottom:12px}
+label{display:block;font-size:12px;color:var(--sub);margin:10px 0 4px}
+input[type=text],input[type=password],textarea,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0d1117;color:var(--tx);font:inherit;font-size:14px;min-width:0}
+textarea{min-height:110px;resize:vertical;font-family:ui-monospace,monospace;font-size:12.5px}
+input[type=color]{width:100%;height:44px;padding:4px;border-radius:10px;border:1px solid var(--border);background:#0d1117}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--tx);font:inherit;font-size:14.5px;cursor:pointer;text-decoration:none;flex:1 1 140px;min-width:0;text-align:center;transition:background .15s,border-color .15s,opacity .15s}
+.btn:hover:not(:disabled){background:rgba(139,92,246,.12)}
+.btn.pri{background:var(--ac);border-color:transparent;color:#fff;font-weight:600}
+.btn.pri:hover:not(:disabled){background:#7c3aed}
+.btn.gh{background:#1f6feb;border-color:transparent;color:#fff;font-weight:600}
+.btn.peligro{background:transparent;border-color:var(--err);color:var(--err)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>*{min-width:0}
+.hidden{display:none!important}
+.log{background:#0a0f14;border:1px solid var(--border);border-radius:10px;padding:12px;font-family:ui-monospace,monospace;font-size:12px;line-height:1.7;margin-top:12px;max-height:220px;overflow:auto;white-space:pre-wrap}
+.log .ok{color:var(--ok)}.log .er{color:var(--err)}.log .wa{color:var(--warn)}
+.acts{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+.note{font-size:12px;color:var(--warn);margin-top:8px}
+footer{text-align:center;color:var(--sub);font-size:11.5px;padding:18px 0}
+.hist{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 2px;border-bottom:1px solid var(--border)}
+.hist .t{font-size:14px;font-weight:600}
+.hist .m{font-size:11.5px;color:var(--sub)}
+.hist .acciones{display:flex;gap:6px;flex:none;flex-wrap:wrap}
+.hist .acciones a,.hist .acciones button{font-size:11.5px;padding:7px 11px;border-radius:9px;border:1px solid var(--border);color:var(--tx);text-decoration:none;background:#0d1117;cursor:pointer}
+#logoPrev{width:46px;height:46px;border-radius:10px;border:1px solid var(--border);object-fit:cover;display:none;margin-top:6px}
+#pv{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:80;display:none;flex-direction:column;padding:12px}
+#pv.abre{display:flex}
+#pv .tit{flex:1;font-size:15px}
+#pv iframe{flex:1;width:100%;border:none;border-radius:12px;background:#fff}
+.pvx{width:auto;flex:none;padding:9px 14px}
+body.tema-claro{--bg: #0d1117;--panel: #161b22;--border:#dddddd;--tx: #e6edf3;--sub: #8b949e}
+body.tema-amoled{--bg: #0d1117;--panel: #161b22;--border:#1c1c1c;--tx: #e6edf3;--sub: #8b949e}
+body.tema-claro input[type=text],body.tema-claro input[type=password],body.tema-claro textarea,body.tema-claro select,body.tema-claro .log,body.tema-claro .hist .acciones a,body.tema-claro .hist .acciones button,body.tema-claro input[type=file]{background:#ffffff;color:#1a1a1a}
+body.tema-amoled input[type=text],body.tema-amoled input[type=password],body.tema-amoled textarea,body.tema-amoled select,body.tema-amoled .log,body.tema-amoled .hist .acciones a,body.tema-amoled .hist .acciones button,body.tema-amoled input[type=file]{background:#000000;color:#f2f2f2}
+#temaUi{position:fixed;left:14px;bottom:14px;z-index:70;width:46px;height:46px;border-radius:50%;border:1px solid var(--border);background:var(--panel);color:var(--tx);font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#temaUi:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+#bannerOff{position:fixed;top:0;left:0;right:0;background:var(--err);color:#fff;text-align:center;padding:8px;font-size:13px;z-index:90;display:none}
+#bannerOff.on{display:block}
+#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#1f6feb;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;z-index:95;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:90vw}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(-4px)}
+#toast.err{background:var(--err)}
+#toast.ok{background:var(--ok)}
+.spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.editor{border:1px solid var(--border);border-radius:10px;padding:10px;margin-top:10px;background:#0a0f14}
+.editor .coins{font-size:12px;color:var(--sub);margin-bottom:6px}
+.editor .coinc{max-height:160px;overflow:auto;border:1px solid var(--border);border-radius:8px;padding:6px;margin-bottom:8px;font-family:ui-monospace,monospace;font-size:12px;line-height:1.6;background:#050a0e}
+.editor .coinc button{background:transparent;border:none;color:var(--tx);text-align:left;padding:2px 4px;cursor:pointer;width:100%;border-radius:4px;font:inherit}
+.editor .coinc button:hover{background:rgba(139,92,246,.2)}
+.editor mark{background:rgba(139,92,246,.5);color:inherit;border-radius:2px}
+.reemplazo{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
+.cc{font-size:11px;color:var(--sub);text-align:right;margin-top:2px}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:3px 8px;border-radius:999px;border:1px solid var(--border);background:#0a0f14;color:var(--sub);margin:3px 3px 0 0}
+.chip button{background:transparent;border:none;color:var(--err);cursor:pointer;font-size:12px;padding:0;margin-left:2px}
+.zona{border:2px dashed var(--border);border-radius:10px;padding:14px;text-align:center;font-size:13px;color:var(--sub);cursor:pointer;transition:border-color .15s,background .15s;margin-top:6px}
+.zona.over{border-color:var(--ac);background:rgba(139,92,246,.08);color:var(--tx)}
+.zona input{display:none}
+.aviso{font-size:12px;color:var(--warn);margin-top:6px}
+.ult{font-size:11.5px;color:var(--sub);margin-top:8px}
+#qrWrap{text-align:center;margin-top:10px}
+#qrWrap canvas{background:#fff;border-radius:8px;padding:6px}
+</style>
+<style id="lf-tema">html,body{background:#0d1117 !important;color:#e6edf3 !important;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif !important;font-size:16px !important}</style><style id="lf-tema">html,body{background:#0d1117 !important;color:#e6edf3 !important;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif !important;font-size:16px !important}</style></head>
+<body>
+<div id="bannerOff">⚠ Sin conexión — los cambios se guardan localmente y se reintentan al reconectar.</div>
+<div id="toast"></div>
+
+<header>
+  <div class="ico">⚙️</div>
+  <div><h1>FabricAppaWebPwaApk</h1><span class="sub">Apps, juegos y webs para clientes</span></div>
+  <span class="pill" id="pillGh">GitHub: <span class="spinner"></span></span>
+  <button class="btn pvx" id="bCfg" title="Servidor" aria-label="Configurar servidor">🔧</button>
+</header>
+
+<div class="card" id="c1">
+  <h2>1 · Conexión con GitHub</h2>
+  <div class="d">La app crea los repositorios, sube los archivos y compila con GitHub Actions.</div>
+  <div class="row">
+    <button class="btn gh" id="bGh">Conectar con GitHub</button>
+  </div>
+  <label>…o sin navegador: token de acceso (repo + workflow)</label>
+  <input type="password" id="pat" placeholder="ghp_…" autocomplete="off">
+  <div class="row" style="margin-top:8px">
+    <button class="btn" id="bPat" style="flex:0 1 auto">Conectar con token</button>
+    <button class="btn peligro hidden" id="bLogout" style="flex:0 1 auto">Desconectar</button>
+  </div>
+</div>
+
+<div class="card hidden" id="c2">
+  <h2>2 · Tipo de código</h2>
+  <div class="d">Web: pegá el código, subí un ZIP con HTML+imágenes, o subí imágenes sueltas. Nativos: el proyecto sale de la plantilla automática.</div>
+  <label>Tecnología</label>
+  <select id="fKind">
+    <option value="web" selected>Web / APK (HTML + Capacitor)</option>
+    <option value="kotlin">Kotlin nativo (Android)</option>
+    <option value="flutter">Flutter (Dart)</option>
+    <option value="rn">React Native (JavaScript)</option>
+  </select>
+
+  <div id="cajaCodigo" style="margin-top:10px">
+    <label id="lblCodigo" style="margin-top:8px">Pegá el index.html que te generé, o elegí el archivo:</label>
+    <textarea id="manualCode" placeholder="<!DOCTYPE html>…"></textarea>
+    <div class="cc" id="ccCode">0 caracteres</div>
+
+    <label style="margin-top:8px">…o elegí el archivo .html</label>
+    <input type="file" id="manualFile" accept=".html,text/html">
+
+    <label style="margin-top:10px">📦 Subir ZIP (HTML + carpetas de imágenes/videos)</label>
+    <label class="zona" id="zonaZip" for="zipFile">
+      Arrastrá un .zip acá o tocá para elegir
+      <input type="file" id="zipFile" accept=".zip,application/zip">
+    </label>
+    <div id="zipMsg" class="aviso"></div>
+    <div id="zipChips" style="margin-top:6px"></div>
+
+    <label style="margin-top:10px">🖼 Subir imágenes sueltas (se guardan con su nombre)</label>
+    <label class="zona" id="zonaImg" for="imgFiles">
+      Arrastrá imágenes (png, jpg, webp, svg) o tocá para elegir
+      <input type="file" id="imgFiles" accept="image/*" multiple>
+    </label>
+    <div id="imgChips" style="margin-top:6px"></div>
+
+    <label style="margin-top:12px">🔎 Buscar y editar dentro del HTML</label>
+    <div class="editor">
+      <input type="text" id="buscar" placeholder="Buscar texto, atributo, id, selector…">
+      <div class="coins" id="coinsInfo">0 coincidencias</div>
+      <div class="coinc" id="coincList"></div>
+      <div class="reemplazo">
+        <input type="text" id="reemplazarCon" placeholder="Reemplazar por… (vacío = crear fragmento nuevo abajo)">
+        <div class="row">
+          <button class="btn" id="bReemplazarTodos" style="flex:1 1 100%">🔁 Reemplazar todos</button>
+          <button class="btn" id="bReemplazarUno" style="flex:1 1 100%">✏️ Reemplazar seleccionado</button>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn" id="bCrearFragmento" style="flex:1 1 100%">➕ Crear fragmento nuevo (antes del &lt;/body&gt;)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="bPrev">👀 Vista previa (con tu paleta)</button>
+    </div>
+  </div>
+
+  <div id="notaNativa" class="hidden" style="font-size:13px;color:var(--warn);margin-top:12px">
+    Modo nativo: el servidor genera y sube todo el proyecto (Gradle/Flutter/RN) con tu nombre, paquete y color. Solo tocá "Generar y construir". El build tarda 10–30 min según la tecnología.
+  </div>
+</div>
+
+<div class="card hidden" id="c3">
+  <h2>3 · Datos del proyecto</h2>
+  <div class="d">Estas opciones aplican a webs, apps y juegos, en versión web y APK.</div>
+  <label>Nombre de la app</label>
+  <input type="text" id="fName" placeholder="Bar El Ejemplo">
+  <label>Cliente / negocio</label>
+  <input type="text" id="fClient" placeholder="Juan Pérez">
+  <label>WhatsApp (código país + número)</label>
+  <input type="text" id="fWhats" inputmode="tel" placeholder="5491122334455">
+  <label>Tipo de proyecto</label>
+  <select id="fProj">
+    <option value="app" selected>App / página web</option>
+    <option value="juego">Juego</option>
+  </select>
+  <label>Entrega</label>
+  <select id="fType">
+    <option value="web">Sitio web (URL pública)</option>
+    <option value="pwa">PWA (web + instalable)</option>
+    <option value="apk">APK Android</option>
+  </select>
+  <label>Modo de página</label>
+  <select id="fTheme">
+    <option value="oscuro" selected>Oscuro</option>
+    <option value="claro">Claro</option>
+    <option value="amoled">AMOLED (negro puro)</option>
+  </select>
+  <label>Color principal</label>
+  <input type="color" id="fColor" value="#8b5cf6">
+  <label>Letra de la app</label>
+  <select id="fFont">
+    <option value="system" selected>Moderna (sans)</option>
+    <option value="serif">Elegante (serif)</option>
+    <option value="mono">Técnica (monospace)</option>
+  </select>
+  <label>Tamaño de letra</label>
+  <select id="fSize">
+    <option value="chica">Chica</option>
+    <option value="media" selected>Mediana</option>
+    <option value="grande">Grande</option>
+  </select>
+  <label>Logo (si no subís, se genera uno con la inicial)</label>
+  <input type="file" id="fLogo" accept="image/*">
+  <img id="logoPrev" alt="logo">
+  <label>Descripción / pedido</label>
+  <textarea id="fDesc" placeholder="Qué tiene que tener la app, estilo, secciones…"></textarea>
+  <div class="cc" id="ccDesc">0 caracteres</div>
+  <div class="row" style="margin-top:14px">
+    <button class="btn pri" id="bBuild">Generar y construir</button>
+    <button class="btn peligro hidden" id="bCancel">✕ Cancelar</button>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button class="btn" id="bLimpiar">🧹 Limpiar para crear otro</button>
+  </div>
+  <div class="log hidden" id="log"></div>
+  <div id="progWrap" class="hidden" style="margin-top:10px">
+    <div style="height:6px;background:#0a0f14;border-radius:999px;overflow:hidden;border:1px solid var(--border)">
+      <div id="progBar" style="height:100%;width:0;background:var(--ac);transition:width .4s"></div>
+    </div>
+    <div class="ult" id="progTxt">Preparando…</div>
+  </div>
+  <div class="acts hidden" id="acts">
+    <a class="btn pri hidden" id="aApk" href="#">⬇ Descargar APK</a>
+    <a class="btn hidden" id="aSite" href="#" target="_blank" rel="noopener">🌐 Abrir sitio web</a>
+    <a class="btn hidden" id="aPwa" href="#" target="_blank" rel="noopener">📲 Abrir PWA</a>
+    <button class="btn hidden" id="bDlSite">⬇ Descargar sitio (HTML)</button>
+    <button class="btn hidden" id="bCopySite">🔗 Copiar URL del sitio</button>
+    <a class="btn hidden" id="aRepo" href="#" target="_blank" rel="noopener">📁 Repositorio</a>
+    <a class="btn hidden" id="aPvLive" href="#">👀 Vista previa del sitio</a>
+    <div id="qrWrap" class="hidden"><canvas id="qrCanvas" width="180" height="180"></canvas></div>
+  </div>
+  <div class="ult" id="ultBuild"></div>
+</div>
+
+<div class="card hidden" id="c4">
+  <h2>📁 Mis creaciones</h2>
+  <div class="d">Todo lo que generaste, guardado acá para volver a abrirlo.</div>
+  <div id="histList"></div>
+  <div class="row" style="margin-top:10px">
+    <button class="btn" id="bHistClear" style="flex:0 1 auto">Vaciar historial</button>
+  </div>
+</div>
+
+<div class="card" id="c5">
+  <h2>🔧 Actualizar el Builder (sin ir a GitHub)</h2>
+  <div class="d">Subí los archivos del sistema y se publican solos. Render se redeploya en 1–2 min. Si algo falla, se conserva la versión anterior.</div>
+  <label>server/index.js</label>
+  <input type="file" id="suSrv" accept=".js">
+  <label>server/app-template.js</label>
+  <input type="file" id="suTpl" accept=".js">
+  <label>web/index.html</label>
+  <input type="file" id="suWeb" accept=".html">
+  <div class="row" style="margin-top:12px">
+    <button class="btn" id="bSelfUp">🚀 Subir y desplegar</button>
+  </div>
+  <div id="suMsg" style="font-size:13px;margin-top:10px;color:var(--sub)"></div>
+</div>
+
+<div class="card" id="c6">
+  <h2>📲 Actualizar el APK del Builder</h2>
+  <div class="d">Descarga el APK mas nuevo que compilo Actions. Instalalo tras desinstalar el anterior (la firma cambia en cada build).</div>
+  <div class="row">
+    <button class="btn" id="bApkBuilder">⬇ Descargar APK nuevo del Builder</button>
+  </div>
+  <div id="apkMsg" style="font-size:13px;margin-top:8px;color:var(--sub)"></div>
+</div>
+
+<footer>FabricAppaWebPwaApk · mate&code 🧉</footer>
+<button id="temaUi" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+
+<div id="pv">
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+    <span class="tit" style="flex:1;font-size:15px" id="pvTit">Vista previa</span>
+    <button class="btn pvx" id="bPvClose">✕ Cerrar</button>
+  </div>
+  <iframe id="pvFrame" sandbox="allow-scripts"></iframe>
+</div>
+<script>
+// ===== CONFIGURACIÓN FIJA =====
+const API_FIJA = 'https://fabricapp-aako.onrender.com';
+const TOKEN_FIJO = '';
+// ================================
+const API = localStorage.getItem('api_base') || API_FIJA;
+try { if (API && window.Capacitor && location.origin !== new URL(API).origin) location.replace(API + '/?v=' + Date.now()); } catch (e) {}
+const $ = id => document.getElementById(id);
+let state = {}, poll = null, ctl = null;
+let zipAssets = {};
+let extraAssets = {};
+
+// ---- toast y utilidades ----
+function toast(msg, tipo) {
+  const t = $('toast'); t.textContent = msg;
+  t.className = 'on' + (tipo ? ' ' + tipo : '');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.className = '', 2600);
+}
+function log(msg, cls) {
+  const el = $('log'); el.classList.remove('hidden');
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = msg;
+  el.appendChild(line); el.scrollTop = el.scrollHeight;
+}
+function slugify(s) {
+  return (s || 'app').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'app';
+}
+function tiempoRel(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return 'hace ' + s + 's';
+  if (s < 3600) return 'hace ' + Math.floor(s / 60) + ' min';
+  if (s < 86400) return 'hace ' + Math.floor(s / 3600) + ' h';
+  return 'hace ' + Math.floor(s / 86400) + ' d';
+}
+function bytesTxt(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+  return (n / 1048576).toFixed(2) + ' MB';
+}
+
+// ---- estado offline ----
+function actualizarOnline() {
+  const off = !navigator.onLine;
+  $('bannerOff').classList.toggle('on', off);
+  if (!off && window._pendingBuild) {
+    toast('Reconectado. Reintentando build pendiente…', 'ok');
+    const body = window._pendingBuild; window._pendingBuild = null;
+    if (body) { $('bBuild').click(); }
+  }
+}
+window.addEventListener('online', actualizarOnline);
+window.addEventListener('offline', actualizarOnline);
+actualizarOnline();
+
+// ---- API con reintento ante fallo de red ----
+const TOKEN = localStorage.getItem('api_token') || '';
+async function api(path, opts, intentos) {
+  opts = opts || {};
+  intentos = intentos == null ? 3 : intentos;
+  opts.headers = Object.assign({}, opts.headers, TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {});
+  let r;
+  try {
+    r = await fetch(API + path, opts);
+  } catch (e) {
+    if (intentos > 0) { await new Promise(r => setTimeout(r, 2000)); return api(path, opts, intentos - 1); }
+    throw new Error('No se pudo contactar al servidor (' + API + '). ¿Render redeployando? Esperá 1 minuto y reintentá.');
+  }
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401 && !opts._reintento) {
+    const pat = (TOKEN_FIJO && TOKEN_FIJO.indexOf('PEGÁ') !== 0) ? TOKEN_FIJO : (localStorage.getItem('gh_pat') || '');
+    if (pat) {
+      try { await conectarToken(pat); opts._reintento = true; return api(path, opts, intentos); } catch (e) {}
+    }
+  }
+  if (!r.ok) throw new Error(d.error || ('Error ' + r.status));
+  return d;
+}
+async function refresh() {
+  let errConex = false;
+  const pill = $('pillGh');
+  pill.innerHTML = 'GitHub: <span class="spinner"></span>';
+  try { state = await api('/api/state'); } catch (e) { state = {}; errConex = true; }
+  if (errConex) {
+    pill.textContent = 'GitHub: sin conexión';
+    pill.classList.remove('on'); pill.classList.add('err');
+  } else {
+    pill.textContent = 'GitHub: ' + (state.github ? state.login : 'no');
+    pill.classList.toggle('on', !!state.github);
+    pill.classList.remove('err');
+  }
+  ['c2','c3','c4'].forEach(i => $(i).classList.toggle('hidden', !state.github));
+  $('bLogout').classList.toggle('hidden', !state.github);
+  renderHist();
+}
+async function conectarToken(t) {
+  const r = await api('/api/token', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: t }) });
+  localStorage.setItem('api_token', r.token || r.api_token || t);
+  localStorage.setItem('gh_pat', t);
+  await refresh();
+  return r.login;
+}
+
+// ---- OAuth / token ----
+$('bGh').onclick = () => {
+  if (window.Capacitor) {
+    api('/api/link/start').then(x => {
+      localStorage.setItem('lf_link_code', x.code);
+      localStorage.setItem('lf_link_ts', Date.now());
+      alert('TU CÓDIGO: ' + x.code + '\n\nSe abre Chrome para autorizar. Volvé con el botón de apps recientes.');
+      window.open(API + '/auth/github?state=link-' + x.code, '_system');
+      iniciarPollLink(x.code);
+    }).catch(e => toast(e.message, 'err'));
+  } else location.href = API + '/auth/github';
+};
+function iniciarPollLink(code) {
+  clearInterval(window._lt);
+  window._lt = setInterval(async () => {
+    try {
+      const st = await api('/api/link/status?code=' + code);
+      if (st.ok) {
+        clearInterval(window._lt);
+        localStorage.removeItem('lf_link_code');
+        localStorage.removeItem('lf_link_ts');
+        localStorage.setItem('api_token', st.token || st.api_token || '');
+        localStorage.setItem('gh_pat', '');
+        toast('¡Conectado como ' + st.login + '!', 'ok');
+        refresh();
+      }
+    } catch (e) {}
+  }, 3000);
+}
+(function reanudarLink() {
+  const code = localStorage.getItem('lf_link_code');
+  const ts = +(localStorage.getItem('lf_link_ts') || 0);
+  if (code && Date.now() - ts < 10 * 60 * 1000) iniciarPollLink(code);
+})();
+$('bPat').onclick = async () => {
+  try { const login = await conectarToken($('pat').value.trim()); toast('Conectado como ' + login + ' ✓', 'ok'); }
+  catch (e) { toast(e.message, 'err'); }
+};
+$('bLogout').onclick = () => {
+  if (!confirm('¿Desconectar GitHub? Se borra el token local.')) return;
+  localStorage.removeItem('api_token');
+  localStorage.removeItem('gh_pat');
+  toast('Desconectado', 'ok');
+  refresh();
+};
+$('bCfg').onclick = () => {
+  const u = prompt('URL del servidor:', localStorage.getItem('api_base') || API_FIJA);
+  if (u !== null) { localStorage.setItem('api_base', u.trim()); location.reload(); }
+};
+
+// ---- autoguardado del formulario ----
+const CAMPOS = ['fName','fClient','fWhats','fProj','fType','fTheme','fColor','fFont','fSize','fDesc','manualCode'];
+function guardarForm() {
+  const o = {};
+  CAMPOS.forEach(id => { const el = $(id); if (el) o[id] = el.value; });
+  localStorage.setItem('lf_form', JSON.stringify(o));
+}
+function cargarForm() {
+  try {
+    const o = JSON.parse(localStorage.getItem('lf_form') || '{}');
+    CAMPOS.forEach(id => { const el = $(id); if (el && o[id] != null) el.value = o[id]; });
+    actualizarContadores();
+  } catch (e) {}
+}
+CAMPOS.forEach(id => { const el = $(id); if (el) el.addEventListener('input', guardarForm); });
+function actualizarContadores() {
+  $('ccCode').textContent = ($('manualCode').value || '').length + ' caracteres';
+  $('ccDesc').textContent = ($('fDesc').value || '').length + ' caracteres';
+}
+$('manualCode').addEventListener('input', actualizarContadores);
+$('fDesc').addEventListener('input', actualizarContadores);
+
+// ---- tipo de código ----
+$('fKind').onchange = () => {
+  const v = $('fKind').value;
+  $('notaNativa').classList.toggle('hidden', v === 'web');
+  $('lblCodigo').textContent = v === 'web'
+    ? 'Pegá el index.html que te generé, o elegí el archivo:'
+    : 'Opcional: pegá tu código (' + (v === 'kotlin' ? 'MainActivity.kt' : v === 'flutter' ? 'main.dart' : 'App.js') + ') o dejalo vacío para la plantilla:';
+};
+
+// ---- carga de archivos HTML ----
+$('manualFile').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => { $('manualCode').value = rd.result; log('Archivo cargado: ' + f.name, 'ok'); actualizarContadores(); guardarForm(); };
+  rd.readAsText(f);
+};
+
+// ---- editor / buscador HTML ----
+let coincidencias = [], idxSel = -1;
+function escaparHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function buscarEnCodigo() {
+  const q = $('buscar').value;
+  const code = $('manualCode').value;
+  coincidencias = []; idxSel = -1;
+  if (!q) { $('coinsInfo').textContent = '0 coincidencias'; $('coincList').innerHTML = ''; return; }
+  let i = 0;
+  while ((i = code.indexOf(q, i)) !== -1) {
+    coincidencias.push({ pos: i, texto: code.slice(Math.max(0, i - 40), i + q.length + 40) });
+    i += q.length;
+  }
+  $('coinsInfo').textContent = coincidencias.length + ' coincidencia(s)';
+  $('coincList').innerHTML = coincidencias.map((c, idx) =>
+    '<button data-idx="' + idx + '">…' + escaparHtml(c.texto).replace(new RegExp(escaparHtml(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'), '<mark>' + escaparHtml(q) + '</mark>') + '…</button>'
+  ).join('');
+  document.querySelectorAll('#coincList button').forEach(b => b.onclick = () => {
+    idxSel = +b.dataset.idx;
+    document.querySelectorAll('#coincList button').forEach(x => x.style.background = '');
+    b.style.background = 'rgba(139,92,246,.3)';
+  });
+}
+$('buscar').addEventListener('input', buscarEnCodigo);
+
+$('bReemplazarTodos').onclick = () => {
+  const q = $('buscar').value, rep = $('reemplazarCon').value;
+  if (!q) { toast('Escribí algo para buscar', 'err'); return; }
+  if (!confirm('Reemplazar ' + coincidencias.length + ' coincidencia(s)?')) return;
+  $('manualCode').value = $('manualCode').value.split(q).join(rep);
+  actualizarContadores(); guardarForm(); buscarEnCodigo();
+  toast('Reemplazos aplicados', 'ok');
+};
+$('bReemplazarUno').onclick = () => {
+  if (idxSel < 0) { toast('Seleccioná una coincidencia primero', 'err'); return; }
+  const q = $('buscar').value, rep = $('reemplazarCon').value;
+  const code = $('manualCode').value;
+  const { pos } = coincidencias[idxSel];
+  $('manualCode').value = code.slice(0, pos) + rep + code.slice(pos + q.length);
+  actualizarContadores(); guardarForm(); buscarEnCodigo();
+  toast('Reemplazo aplicado', 'ok');
+};
+$('bCrearFragmento').onclick = () => {
+  const frag = $('reemplazarCon').value.trim();
+  if (!frag) { toast('Escribí el fragmento en "Reemplazar por…"', 'err'); return; }
+  const code = $('manualCode').value;
+  const idx = code.lastIndexOf('</body>');
+  if (idx === -1) {
+    $('manualCode').value = code + '\n' + frag;
+  } else {
+    $('manualCode').value = code.slice(0, idx) + frag + '\n' + code.slice(idx);
+  }
+  actualizarContadores(); guardarForm();
+  toast('Fragmento insertado antes de </body>', 'ok');
+};
+
+// ---- logo (preview) ----
+$('fLogo').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => { const im = $('logoPrev'); im.src = rd.result; im.style.display = 'block'; };
+  rd.readAsDataURL(f);
+};
+// ---- ZIP upload ----
+function manejarArchivoZip(f) {
+  if (!window.JSZip) { toast('JSZip no cargó. Revisá la conexión.', 'err'); return; }
+  $('zipMsg').textContent = 'Leyendo ZIP…';
+  const rd = new FileReader();
+  rd.onload = async () => {
+    try {
+      const zip = await JSZip.loadAsync(rd.result);
+      const htmlCandidatos = [];
+      const nombres = Object.keys(zip.files);
+      for (const nombre of nombres) {
+        const entry = zip.files[nombre];
+        if (entry.dir) continue;
+        if (nombre.startsWith('__MACOSX/')) continue;
+        if (/\.html?$/i.test(nombre)) htmlCandidatos.push(nombre);
+      }
+      if (!htmlCandidatos.length) {
+        const muestra = Object.keys(zip.files).filter(n => !zip.files[n].dir).slice(0, 8).join(', ');
+        $('zipMsg').textContent = '⚠ No encontré .html dentro. Archivos vistos: ' + muestra;
+        return;
+      }
+      const elegido = htmlCandidatos.find(n => /(^|\/)index\.html?$/i.test(n)) || htmlCandidatos[0];
+      const html = await zip.files[elegido].async('string');
+      $('manualCode').value = html;
+      actualizarContadores(); guardarForm();
+      log('ZIP: HTML cargado (' + elegido + ')', 'ok');
+
+      zipAssets = {};
+      const imagenes = nombres.filter(n => !zip.files[n].dir && !n.startsWith('__MACOSX/') && /\.(png|jpe?g|gif|webp|svg|avif)$/i.test(n));
+      const videos = nombres.filter(n => !zip.files[n].dir && !n.startsWith('__MACOSX/') && /\.(mp4|webm|ogg|mov)$/i.test(n));
+      const procesar = [...imagenes, ...videos];
+      let total = 0;
+      for (const n of procesar) {
+        const b64 = await zip.files[n].async('base64');
+        const ext = n.split('.').pop().toLowerCase();
+        const mime = { png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', gif:'image/gif', webp:'image/webp', svg:'image/svg+xml', avif:'image/avif', mp4:'video/mp4', webm:'video/webm', ogg:'video/ogg', mov:'video/quicktime' }[ext] || 'application/octet-stream';
+        zipAssets[n] = 'data:' + mime + ';base64,' + b64;
+        total += zip.files[n]._data ? zip.files[n]._data.uncompressedSize : 0;
+      }
+      $('zipMsg').textContent = '✓ ' + procesar.length + ' assets embebidos (' + bytesTxt(total) + ')';
+      renderChips();
+    } catch (e) {
+      console.error('Error procesando ZIP:', e);
+      $('zipMsg').textContent = '⚠ ' + e.message;
+    }
+  };
+  rd.readAsArrayBuffer(f);
+}
+$('zipFile').onchange = e => { const f = e.target.files[0]; if (f) manejarArchivoZip(f); };
+const zonaZip = $('zonaZip');
+['dragenter','dragover'].forEach(ev => zonaZip.addEventListener(ev, e => { e.preventDefault(); zonaZip.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => zonaZip.addEventListener(ev, e => { e.preventDefault(); zonaZip.classList.remove('over'); }));
+zonaZip.addEventListener('drop', e => {
+  const f = e.dataTransfer.files[0];
+  if (f && /\.zip$/i.test(f.name)) manejarArchivoZip(f);
+  else toast('Soltá un .zip', 'err');
+});
+
+// ---- imágenes sueltas ----
+$('imgFiles').onchange = async e => {
+  const files = Array.from(e.target.files || []);
+  for (const f of files) {
+    const b64 = await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); });
+    extraAssets[f.name] = b64;
+  }
+  renderChips();
+  toast(files.length + ' imagen(es) agregada(s)', 'ok');
+};
+const zonaImg = $('zonaImg');
+['dragenter','dragover'].forEach(ev => zonaImg.addEventListener(ev, e => { e.preventDefault(); zonaImg.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => zonaImg.addEventListener(ev, e => { e.preventDefault(); zonaImg.classList.remove('over'); }));
+zonaImg.addEventListener('drop', async e => {
+  const files = Array.from(e.dataTransfer.files || []).filter(f => /^image\//.test(f.type));
+  for (const f of files) {
+    const b64 = await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(f); });
+    extraAssets[f.name] = b64;
+  }
+  renderChips();
+  if (files.length) toast(files.length + ' imagen(es) agregada(s)', 'ok');
+});
+
+function renderChips() {
+  const zc = Object.keys(zipAssets), ic = Object.keys(extraAssets);
+  $('zipChips').innerHTML = zc.map(n => '<span class="chip">' + n + '<button data-tipo="zip" data-n="' + n + '">✕</button></span>').join('');
+  $('imgChips').innerHTML = ic.map(n => '<span class="chip">' + n + '<button data-tipo="img" data-n="' + n + '">✕</button></span>').join('');
+  document.querySelectorAll('.chip button').forEach(b => b.onclick = () => {
+    if (b.dataset.tipo === 'zip') delete zipAssets[b.dataset.n];
+    else delete extraAssets[b.dataset.n];
+    renderChips();
+  });
+}
+// ---- vista previa con paleta aplicada ----
+const FUENTES = { system: "-apple-system,'Segoe UI',Roboto,Arial,sans-serif", serif: "Georgia,'Times New Roman',serif", mono: "ui-monospace,monospace" };
+const TAMANOS = { chica: '14px', media: '16px', grande: '19px' };
+const FONDOS = { oscuro: '#0d1117', claro: '#ffffff', amoled: '#000000' };
+const TEXTOS = { oscuro: '#e6edf3', claro: '#1a1a1a', amoled: '#f2f2f2' };
+function inyectarPaleta(html) {
+  const color = $('fColor').value;
+  const font = FUENTES[$('fFont').value] || FUENTES.system;
+  const size = TAMANOS[$('fSize').value] || TAMANOS.media;
+  const bg = FONDOS[$('fTheme').value] || FONDOS.oscuro;
+  const tx = TEXTOS[$('fTheme').value] || TEXTOS.oscuro;
+  const css = ':root{--ac: #8b5cf6;--bg: #0d1117;--tx: #e6edf3;font-size:' + size + '}\nbody{background:var(--bg);color:var(--tx);font-family:' + font + '}\na,button{color:var(--ac)}';
+  const estilo = '<style id="__lf_paleta">' + css + '</style>';
+  if (/<\/head>/i.test(html)) return html.replace(/<\/head>/i, estilo + '</head>');
+  return estilo + html;
+}
+function aplicarAssetsEnHtml(html) {
+  const todos = Object.assign({}, zipAssets, extraAssets);
+  Object.keys(todos).forEach(ruta => {
+    const base = ruta.split('/').pop();
+    const regex = new RegExp('(src|href)=([\'"])(' + ruta.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '|' + base.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')\\2', 'g');
+    html = html.replace(regex, (m, attr, q) => attr + '=' + q + todos[ruta] + q);
+  });
+  return html;
+}
+
+function abrirPv(titulo) { $('pvTit').textContent = titulo; $('pv').classList.add('abre'); }
+function cerrarPv() { $('pv').classList.remove('abre'); $('pvFrame').srcdoc = ''; $('pvFrame').src = 'about:blank'; }
+$('bPvClose').onclick = cerrarPv;
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('pv').classList.contains('abre')) cerrarPv();
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); if (!$('bBuild').disabled) $('bBuild').click(); }
+});
+$('bPrev').onclick = () => {
+  let code = $('manualCode').value.trim();
+  if (!code) { toast('Pegá el código primero', 'err'); return; }
+  if (!/<!DOCTYPE|<html/i.test(code)) {
+    if (!confirm('El código no parece un HTML completo. ¿Previsualizar igual?')) return;
+  }
+  code = aplicarAssetsEnHtml(code);
+  code = inyectarPaleta(code);
+  $('pvFrame').removeAttribute('src');
+  $('pvFrame').srcdoc = code;
+  abrirPv('Vista previa del código (con tu paleta)');
+};
+$('aPvLive').onclick = (e) => {
+  e.preventDefault();
+  if (!$('aPvLive').href || $('aPvLive').getAttribute('href') === '#') return;
+  $('pvFrame').srcdoc = '';
+  $('pvFrame').src = $('aPvLive').href;
+  abrirPv('Vista previa del sitio (puede tardar ~1 min en publicarse)');
+};
+
+// ---- auto-actualizacion del builder ----
+function leerArchivo(file){
+  return new Promise((res, rej)=>{ const rd=new FileReader(); rd.onload=()=>res(rd.result); rd.onerror=rej; rd.readAsText(file); });
+}
+$('bSelfUp').onclick = async () => {
+  const mapa = [['suSrv','server/index.js'],['suTpl','server/app-template.js'],['suWeb','web/index.html']];
+  const files = [];
+  for (const [id, path] of mapa) {
+    const f = $(id).files[0];
+    if (f) files.push({ path, content: await leerArchivo(f) });
+  }
+  if (!files.length) { $('suMsg').textContent = 'Elegí al menos un archivo.'; return; }
+  if (!confirm('¿Publicar ' + files.length + ' archivo(s)? La app se reiniciará en Render.')) return;
+  $('suMsg').textContent = 'Subiendo…';
+  try {
+    const r = await api('/api/selfupdate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ files }) });
+    $('suMsg').textContent = '✓ ' + r.subidos + ' archivo(s) subidos. ' + r.aviso;
+  } catch (e) {
+    $('suMsg').textContent = '✗ ' + e.message;
+  }
+};
+
+// ---- historial ----
+function getHist(){ try { return JSON.parse(localStorage.getItem('lf_hist')||'[]'); } catch(e){ return []; } }
+function saveHist(entry){
+  const h = getHist().filter(x => x.repo !== entry.repo);
+  h.unshift(entry);
+  localStorage.setItem('lf_hist', JSON.stringify(h.slice(0, 30)));
+}
+function renderHist(){
+  const h = getHist();
+  $('histList').innerHTML = h.map((x, i) =>
+    '<div class="hist"><div style="min-width:0"><div class="t">' + escaparHtml(x.nombre) + '</div>' +
+    '<div class="m">' + x.fecha + ' · ' + x.tipo + (x.juego ? ' · 🎮 juego' : '') + (x.ts ? ' · ' + tiempoRel(x.ts) : '') + '</div></div>' +
+    '<div class="acciones">' +
+    (x.site ? '<a href="' + x.site + '" target="_blank" rel="noopener">🌐</a>' : '') +
+    (x.repo ? '<a href="' + x.repo + '" target="_blank" rel="noopener">📁</a>' : '') +
+    '<button data-act="regen" data-i="' + i + '">↻</button>' +
+    '<button data-act="del" data-i="' + i + '">✕</button>' +
+    '</div></div>'
+  ).join('') || '<div class="m" style="padding:12px 0">Todavía no creaste nada. ¡A la primera! 🚀</div>';
+  document.querySelectorAll('#histList button[data-act]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, hh = getHist();
+    if (b.dataset.act === 'del') {
+      if (!confirm('¿Borrar "' + hh[i].nombre + '" del historial?')) return;
+      hh.splice(i, 1); localStorage.setItem('lf_hist', JSON.stringify(hh)); renderHist();
+    } else if (b.dataset.act === 'regen') {
+      const e = hh[i];
+      if (e.form) { Object.keys(e.form).forEach(id => { const el = $(id); if (el) el.value = e.form[id]; }); actualizarContadores(); guardarForm(); }
+      if (e.logo) { $('logoPrev').src = e.logo; $('logoPrev').style.display = 'block'; }
+      toast('Formulario restaurado', 'ok');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+}
+$('bHistClear').onclick = () => { localStorage.removeItem('lf_hist'); renderHist(); };
+
+// ---- logo helpers ----
+function logoDeArchivo(file){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{
+      const c=document.createElement('canvas');c.width=1024;c.height=1024;
+      const x=c.getContext('2d');
+      const k=Math.max(1024/img.width,1024/img.height);
+      const w=img.width*k,h=img.height*k;
+      x.drawImage(img,(1024-w)/2,(1024-h)/2,w,h);
+      res(c.toDataURL('image/png'));
+    };
+    img.src=URL.createObjectURL(file);
+  });
+}
+function logoDeLetra(nombre,color){
+  const c=document.createElement('canvas');c.width=1024;c.height=1024;
+  const x=c.getContext('2d');
+  x.fillStyle=/^#[0-9a-f]{6}$/i.test(color) ? color : '#8b5cf6';
+  x.fillRect(0,0,1024,1024);
+  x.fillStyle='#ffffff';x.textAlign='center';x.textBaseline='middle';
+  x.font='700 560px -apple-system,"Segoe UI",Roboto,Arial,sans-serif';
+  const letra=(nombre||'A').trim().charAt(0).toUpperCase()||'A';
+  x.fillText(letra,512,560);
+  return c.toDataURL('image/png');
+}
+function setConstruyendo(on){
+  $('bBuild').disabled = on;
+  $('bBuild').innerHTML = on ? '<span class="spinner"></span> Construyendo…' : 'Generar y construir';
+  $('bCancel').classList.toggle('hidden', !on);
+}
+$('bCancel').onclick = () => {
+  if (ctl) ctl.abort();
+  clearInterval(poll);
+  setConstruyendo(false);
+  $('progWrap').classList.add('hidden');
+  log('⛔ Trabajo cancelado. Podés hacer los cambios y volver a generar.', 'wa');
+};
+
+// ---- limpiar formulario ----
+$('bLimpiar').onclick = () => {
+  if (!confirm('¿Vaciar todos los campos para crear otra app? El historial se conserva.')) return;
+  CAMPOS.forEach(id => { const el = $(id); if (el) el.value = ''; });
+  $('fKind').value = 'web'; $('fProj').value = 'app'; $('fType').value = 'web';
+  $('fTheme').value = 'oscuro'; $('fColor').value = '#8b5cf6';
+  $('fFont').value = 'system'; $('fSize').value = 'media';
+  $('manualCode').value = '';
+  $('fLogo').value = '';
+  $('logoPrev').style.display = 'none'; $('logoPrev').src = '';
+  $('zipFile').value = ''; $('imgFiles').value = '';
+  zipAssets = {}; extraAssets = {}; renderChips();
+  $('buscar').value = ''; $('reemplazarCon').value = ''; coincidencias = []; idxSel = -1;
+  $('coincList').innerHTML = ''; $('coinsInfo').textContent = '0 coincidencias';
+  $('log').innerHTML = ''; $('log').classList.add('hidden');
+  $('acts').classList.add('hidden');
+  $('progWrap').classList.add('hidden');
+  $('ultBuild').textContent = '';
+  ['aApk','aSite','aPwa','aRepo','aPvLive','bDlSite','bCopySite'].forEach(i => { const el=$(i); el.classList.add('hidden'); if (el.tagName==='A') el.setAttribute('href','#'); });
+  $('qrWrap').classList.add('hidden');
+  actualizarContadores();
+  localStorage.removeItem('lf_form');
+  toast('Formulario limpio', 'ok');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ---- QR simple ----
+function pintarQR(texto) {
+  const cv = $('qrCanvas'); const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle = '#0d1117'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('QR:', cv.width/2, 20);
+  if (window.QRCode) {
+    try { const tmp = document.createElement('div'); new QRCode(tmp, { text: texto, width: 180, height: 180 }); cv.replaceWith(tmp.querySelector('canvas') || cv); } catch(e) {}
+  } else {
+    ctx.fillText(texto.slice(0, 40), cv.width/2, 90);
+  }
+}
+
+// ---- construir ----
+$('bBuild').onclick = async () => {
+  clearInterval(poll);
+  if (ctl) ctl.abort();
+  $('log').innerHTML = ''; $('log').classList.add('hidden');
+  $('acts').classList.add('hidden');
+  $('progWrap').classList.add('hidden');
+  $('ultBuild').textContent = '';
+  ['aApk','aSite','aPwa','aRepo','aPvLive','bDlSite','bCopySite'].forEach(i => {
+    const el = $(i); el.classList.add('hidden');
+    if (el.tagName === 'A') el.setAttribute('href', '#');
+  });
+  $('qrWrap').classList.add('hidden');
+
+  const type = $('fType').value;
+  const kind = $('fKind').value;
+  const appName = $('fName').value.trim();
+  const clientName = $('fClient').value.trim();
+  const proj = $('fProj').value;
+
+  if (!appName) { toast('Poné un nombre de app.', 'err'); $('fName').focus(); return; }
+  if (kind === 'web' && !$('manualCode').value.trim()) {
+    toast('En modo Web necesitás pegar el código o cargar un ZIP.', 'err'); $('manualCode').focus(); return;
+  }
+  if (!navigator.onLine) {
+    window._pendingBuild = true;
+    toast('Sin conexión: se reintentará al reconectar', 'err');
+    return;
+  }
+
+  const lf = $('fLogo').files[0];
+  const logo = lf ? await logoDeArchivo(lf) : logoDeLetra(appName, $('fColor').value);
+  const body = {
+    mode: 'manual', type,
+    kind, proj,
+    appName, clientName: clientName || 'Cliente',
+    repoSlug: slugify(appName),
+    color: $('fColor').value,
+    description: $('fDesc').value,
+    whatsapp: $('fWhats').value.replace(/\D/g, ''),
+    theme: $('fTheme').value,
+    font: $('fFont').value,
+    fsize: $('fSize').value,
+    logo: logo,
+    model: '',
+    manualCode: kind === 'web' ? aplicarAssetsEnHtml($('manualCode').value) : '',
+    assets: Object.assign({}, zipAssets, extraAssets)
+  };
+  setConstruyendo(true);
+  ctl = new AbortController();
+  $('progWrap').classList.remove('hidden');
+  const pasos = ['Creando repo y subiendo…','Esperando Actions…','Compilando…','Publicando…','Listo'];
+  function setProg(i, txt) { $('progBar').style.width = Math.min(100, (i / (pasos.length-1)) * 100) + '%'; $('progTxt').textContent = txt || pasos[i]; }
+  setProg(0);
+  try {
+    log('Creando repositorio y subiendo archivos…');
+    const r = await api('/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl.signal });
+    log('✓ Repo creado: ' + r.repo, 'ok');
+    log('✓ Archivos subidos', 'ok');
+    setProg(1);
+    $('aRepo').href = r.repoUrl; $('aRepo').classList.remove('hidden');
+    if (r.siteUrl) {
+      $('aSite').href = r.siteUrl; $('aSite').classList.remove('hidden');
+      if (type === 'pwa') { $('aPwa').href = r.siteUrl; $('aPwa').classList.remove('hidden'); }
+      $('aPvLive').href = r.siteUrl; $('aPvLive').classList.remove('hidden');
+      $('bCopySite').classList.remove('hidden');
+      $('bDlSite').classList.remove('hidden');
+      $('bCopySite').onclick = () => { navigator.clipboard.writeText(r.siteUrl); toast('URL copiada', 'ok'); };
+      $('bDlSite').onclick = () => {
+        const blob = new Blob([aplicarAssetsEnHtml($('manualCode').value)], { type: 'text/html' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = slugify(appName) + '.html'; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      };
+      $('qrWrap').classList.remove('hidden');
+      pintarQR(r.siteUrl);
+      log('✓ Web: ' + r.siteUrl + ' (~1 min en publicarse)', 'ok');
+    }
+    const formSnapshot = {}; CAMPOS.forEach(id => { const el=$(id); if(el) formSnapshot[id]=el.value; });
+    saveHist({
+      nombre: body.appName, tipo: type, juego: proj === 'juego',
+      repo: r.repoUrl, site: r.siteUrl || '',
+      fecha: new Date().toLocaleString('es-AR'),
+      ts: Date.now(), form: formSnapshot, logo
+    });
+    renderHist();
+    $('ultBuild').textContent = 'Último build: ' + new Date().toLocaleString('es-AR');
+
+    if (type === 'apk' || type === 'pwa') {
+      log('Compilando APK en GitHub Actions… (podés cancelar)', 'wa');
+      let fallos = 0;
+      poll = setInterval(async () => {
+        try {
+          const run = await api('/api/runs?repo=' + encodeURIComponent(r.repo));
+          if (run.none) return;
+          fallos = 0;
+          const st = (run.status || '') + (run.conclusion ? ' → ' + run.conclusion : '');
+          if (st && st !== window._lastSt) { log('estado: ' + st); window._lastSt = st; }
+          if (run.status === 'queued' || run.status === 'in_progress') setProg(2, 'Compilando en Actions… (' + run.status + ')');
+          if (run.conclusion === 'success') {
+            clearInterval(poll);
+            setProg(pasos.length - 1, 'Listo ✓');
+            log('✓ APK listo', 'ok');
+            const urlApk = API + '/api/artifact?repo=' + encodeURIComponent(r.repo);
+            $('aApk').href = urlApk;
+            $('aApk').onclick = (e) => { e.preventDefault(); descargarConAuth(urlApk, slugify(appName) + '.apk'); };
+            $('aApk').classList.remove('hidden');
+            $('acts').classList.remove('hidden');
+          } else if (run.conclusion) {
+            clearInterval(poll);
+            setProg(2, '✗ ' + run.conclusion);
+            log('✗ Compilación: ' + run.conclusion + '. Revisá Actions en el repo.', 'er');
+          }
+        } catch (e) {
+          fallos++;
+          if (fallos >= 3) { clearInterval(poll); log('✗ No se pudo consultar el estado del build.', 'er'); }
+        }
+      }, 15000);
+    } else {
+      setProg(pasos.length - 1, 'Listo ✓');
+    }
+    $('acts').classList.remove('hidden');
+  } catch (e) {
+    if (e.name === 'AbortError') { }
+    else log('✗ ' + e.message, 'er');
+  } finally {
+    setConstruyendo(false);
+    ctl = null;
+  }
+};
+
+// ---- descarga con token en header ----
+async function descargarConAuth(url, filename) {
+  try {
+    const r = await fetch(url, { headers: TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {} });
+    if (!r.ok) throw new Error('Error ' + r.status);
+    const blob = await r.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  } catch (e) {
+    alert('No se pudo descargar: ' + e.message);
+  }
+}
+
+// ---- tema UI ----
+(function(){
+  const ORDEN=['','tema-claro','tema-amoled'];
+  let i=+(localStorage.getItem('lf_ui')||0);
+  function aplicar(){
+    document.body.classList.remove('tema-claro','tema-amoled');
+    if(ORDEN[i])document.body.classList.add(ORDEN[i]);
+    const b=$('temaUi');
+    if(b)b.textContent=i===1?'☀️':(i===2?'🖤':'🌙');
+    localStorage.setItem('lf_ui',i);
+  }
+  aplicar();
+  $('temaUi').onclick=()=>{i=(i+1)%ORDEN.length;aplicar();};
+})();
+
+// ---- descargar APK del builder ----
+$('bApkBuilder').onclick = () => {
+  $('apkMsg').textContent = 'Buscando el APK mas nuevo…';
+  const u = API + '/api/builder-apk?repo=' + encodeURIComponent('FabricApp');
+  descargarConAuth(u, 'FabricAppaWebPwaApk-builder.apk');
+  $('apkMsg').textContent = 'Descargando… instalalo tras desinstalar el anterior.';
+};
+
+// ---- caducidad del token (30 días) ----
+(function checkTokenAge() {
+  const ts = +(localStorage.getItem('lf_token_ts') || 0);
+  if (ts && Date.now() - ts > 30 * 86400 * 1000) {
+    localStorage.removeItem('api_token'); localStorage.removeItem('gh_pat');
+    toast('El token venció. Reconectá GitHub.', 'err');
+  } else if (TOKEN) {
+    localStorage.setItem('lf_token_ts', ts || Date.now());
+  }
+})();
+
+// ---- cancelar polling al cerrar pestaña ----
+window.addEventListener('beforeunload', () => { clearInterval(poll); if (ctl) ctl.abort(); });
+
+// ---- arranque ----
+const q = new URLSearchParams(location.search);
+if (q.get('error')) log('✗ ' + q.get('error'), 'er');
+history.replaceState({}, '', location.pathname);
+cargarForm();
+refresh();
+(async () => {
+  try {
+    const pat = (TOKEN_FIJO && TOKEN_FIJO.indexOf('PEGÁ') !== 0) ? TOKEN_FIJO : localStorage.getItem('gh_pat');
+    if (pat && !state.github) await conectarToken(pat);
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
